@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Wled TV</string>
+    <string name="Welcome">Добро пожаловать!</string>
+    <string name="Colors">"  Цвета"</string>
+    <string name="Palettes">"  Палитры"</string>
+    <string name="Effects">"  Эффекты"</string>
+    <string name="Settings">"  Настройки"</string>
+    <string name="Brightness">🔆 Яркость</string>
+    <string name="Speed_effects">⏩ Скорость эффектов</string>
+    <string name="Effect_intensity">🔥 Интенсивность эффекта</string>
+    <string name="Delete_all_data">🗑️ Удалить все данные приложения</string>
+    <string name="Warning">⚠️ Внимание!</string>
+    <string name="Error">❌ Ошибка!</string>
+    <string name="Text_delete_data">При удалении всех данных будут безвозвратно удалены ранее введенный IP-адрес и другие сохраненные настройки. Приложение закроется. Вы уверены, что хотите продолжить?</string>
+    <string name="YES">Да</string>
+    <string name="NO">Нет</string>
+    <string name="Enter_IP">⚠️ Введите IP-адрес вашего WLED</string>
+    <string name="Error_IP_text">Вы не ввели IP адрес!</string>
+    <string name="Settings_title">Настройки</string>
+    <string name="Donate">💵 Поддержать автора</string>
+    <string name="Donate_text">Отсканируйте QR-код с помощью телефона и вы попадете на страницу поддержки разработчика.</string>
+    <string name="about">📄 О приложении</string>
+
+</resources>
