@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<style>
+	/* Стили для модального окна */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+}
+
+
+button {
+  background-color: #555555;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+	<meta charset="utf-8">
+	<meta name="theme-color" content="#222222">
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<link rel="shortcut icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAGACGAAAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAQAAAAEAgGAAAAH/P/YQAAAE1JREFUOI1j/P//PwOxgNGeAUMxE9G6cQCKDWAhpADZ2f8PMjBS3QW08QK20KaZC2gfC9hCnqouoNgARgY7zMxAyNlUdQHlXiAlO2MDAD63EVqNHAe0AAAAAElFTkSuQmCC"/>
+	<title>WLED</title>
+	<script>
+	function feedback(){}
+	// instead of including [script src="iro.js"][/script] and [script src="rangetouch.js"][/script]
+	// (which would be inlined by nodeJS inliner during minimization and compression) we need to load them dynamically
+	// the following is needed to load iro.js and rangetouch.js as consecutive requests to allow ESP8266
+	// to keep up with requests (if requests happent too fast some may not get processed)
+	// it will also call onLoad() after last is loaded (it was removed from [body onload="onLoad()"]).
+	var h  = document.getElementsByTagName('head')[0];
+	var l  = document.createElement('script');
+	l.type = 'application/javascript';
+	l.src = 'iro.js';
+	l.addEventListener('load', (e) => {
+		// after iro is loaded initialize global variable
+		cpick = new iro.ColorPicker("#picker", {
+			width: 260,
+			wheelLightness: false,
+			wheelAngle: 270,
+			wheelDirection: "clockwise",
+			layout: [{
+				component: iro.ui.Wheel,
+				options: {}
+			}]
+		});
+		cpick.on("input:end", () => {setColor(1);});
+		cpick.on("color:change", () => {updatePSliders()});
+		var l  = document.createElement('script');
+		l.type = 'application/javascript';
+		l.src = 'rangetouch.js';
+		l.addEventListener('load', (e) => {
+			// after rangetouch is loaded initialize global variable
+			ranges = RangeTouch.setup('input[type="range"]', {});
+			let stateCheck = setInterval(() => {
+				if (document.readyState === 'complete') {
+					clearInterval(stateCheck);
+					// document ready, start processing UI
+					onLoad();
+				}
+			}, 100);
+		});
+		setTimeout(function(){h.appendChild(l)},50);
+	});
+	setTimeout(function(){h.appendChild(l)},50);
+	</script>
+
+</head>
+<body>
+
+
+<noscript><div class="overlay" style="opacity:1;">Sorry, WLED UI needs JavaScript!</div></noscript>
+
+
+<div class="wrapper" id="top">
+	<div class="tab top">
+		<div class="btnwrap">
+<center>
+			<div title="Effect intensity">
+
+				<i class="icons slider-icon" onclick="tglLabels()"></i>
+<p style="font-size:50px; color:white" class="label hd">Effect intensity</p>
+				<div class="sliderwrap il">
+					<input id="sliderIntensity" onchange="setIntensity()" oninput="updateTrail(this)" max="255" step="10" min="0" type="range" value="128" />
+					<div class="sliderdisplay"></div>
+				</div>
+		
+			</div>
+	</center>	
+        
+		</div>
+		
+	</div>
+</div>
+
+<div class ="container">
+    <div class="tabcontent">
+		
+		</div>
+
+		
+
+		<div style="display: none;" id="picker" class="center"></div>
+
+		<div style="display: none;" id="Colors" class="center">
+		
+			</div>
+		</div>
+	</div>
+</div>
+
+<div style="display: none;" id="connind"></div>
+<div style="display: none;" id="toast"></div>
+<div style="display: none;" id="namelabel" onclick="toggleNodes()"></div>
+
+
+<script src="simple.js"></script>
+</body>
+</html>

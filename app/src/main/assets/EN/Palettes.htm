@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+	/* Стили для модального окна */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+}
+
+
+
+button {
+  background-color: #222222;
+  border: none;
+	width: 350px;
+  color: white;
+  padding: 16px 32px;
+  text-align: center;
+  font-size: 16px;
+  margin: 4px 2px;
+  opacity: 0.6;
+  transition: 0.3s;
+  display: inline-block;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button:hover {opacity: 1}
+</style>
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+	<meta charset="utf-8">
+	<meta name="theme-color" content="#222222">
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<link rel="shortcut icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAGACGAAAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAQAAAAEAgGAAAAH/P/YQAAAE1JREFUOI1j/P//PwOxgNGeAUMxE9G6cQCKDWAhpADZ2f8PMjBS3QW08QK20KaZC2gfC9hCnqouoNgARgY7zMxAyNlUdQHlXiAlO2MDAD63EVqNHAe0AAAAAElFTkSuQmCC"/>
+	<title>WLED</title>
+	<script>
+	function feedback(){}
+	// instead of including [script src="iro.js"][/script] and [script src="rangetouch.js"][/script]
+	// (which would be inlined by nodeJS inliner during minimization and compression) we need to load them dynamically
+	// the following is needed to load iro.js and rangetouch.js as consecutive requests to allow ESP8266
+	// to keep up with requests (if requests happent too fast some may not get processed)
+	// it will also call onLoad() after last is loaded (it was removed from [body onload="onLoad()"]).
+	var h  = document.getElementsByTagName('head')[0];
+	var l  = document.createElement('script');
+	l.type = 'application/javascript';
+	l.src = 'iro.js';
+	l.addEventListener('load', (e) => {
+		// after iro is loaded initialize global variable
+		cpick = new iro.ColorPicker("#picker", {
+			width: 260,
+			wheelLightness: false,
+			wheelAngle: 270,
+			wheelDirection: "clockwise",
+			layout: [{
+				component: iro.ui.Wheel,
+				options: {}
+			}]
+		});
+		cpick.on("input:end", () => {setColor(1);});
+		cpick.on("color:change", () => {updatePSliders()});
+		var l  = document.createElement('script');
+		l.type = 'application/javascript';
+		l.src = 'rangetouch.js';
+		l.addEventListener('load', (e) => {
+			// after rangetouch is loaded initialize global variable
+			ranges = RangeTouch.setup('input[type="range"]', {});
+			let stateCheck = setInterval(() => {
+				if (document.readyState === 'complete') {
+					clearInterval(stateCheck);
+					// document ready, start processing UI
+					onLoad();
+				}
+			}, 100);
+		});
+		setTimeout(function(){h.appendChild(l)},50);
+	});
+	setTimeout(function(){h.appendChild(l)},50);
+	</script>
+	
+</head>
+<body>
+
+
+<noscript><div class="overlay" style="opacity:1;">Sorry, WLED UI needs JavaScript!</div></noscript>
+
+<div class="wrapper" id="top">
+	<div style="display: none;"  class="tab top">
+
+		<div style="display: none;"  id="briwrap">
+			<p class="label hd">Global brightness</p>
+			<div class="il">
+				<i class="icons slider-icon" onclick="tglTheme()">&#xe2a6;</i>
+				<div class="sliderwrap il">
+					<input id="sliderBri" onchange="setBri()" oninput="updateTrail(this)" max="255" min="1" type="range" value="128" />
+					<div class="sliderdisplay"></div>
+				</div>
+				<output class="sliderbubble"></output>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class ="container">
+    <div class="tabcontent">
+		
+		</div>
+
+		<div style="display: none;"  id="QCS" class="center">
+			<p class="label h">Solid color</p>
+			<div id="qcs-w" class="center">
+				<div class="qcs" onclick="pC('#ff0000');" title="Red" style="background-color:#ff0000;"></div>
+				<div class="qcs" onclick="pC('#ffa000');" title="Orange" style="background-color:#ffa000;"></div>
+				<div class="qcs" onclick="pC('#ffc800');" title="Yellow" style="background-color:#ffc800;"></div>
+				<div class="qcs" onclick="pC('#ffe0a0');" title="Warm White" style="background-color:#ffe0a0;"></div>
+				<div class="qcs" onclick="pC('#ffffff');" title="White" style="background-color:#ffffff;"></div>
+				<div class="qcs qcsb" onclick="pC('#000000');" title="Black" style="background-color:#000000;"></div><br>
+				<div class="qcs" onclick="pC('#ff00ff');" title="Pink" style="background-color:#ff00ff;"></div>
+				<div class="qcs" onclick="pC('#0000ff');" title="Blue" style="background-color:#0000ff;"></div>
+				<div class="qcs" onclick="pC('#00ffc8');" title="Cyan" style="background-color:#00ffc8;"></div>
+				<div class="qcs" onclick="pC('#08ff00');" title="Green" style="background-color:#08ff00;"></div>
+				<div class="qcs" onclick="pC('rnd');" title="Random" style="background:linear-gradient(to right, red, orange, yellow, green, blue, purple);transform: translateY(-11px);">R</div>
+			</div>
+		</div>
+
+		<div  style="display: none;"  id="picker" class="center"></div>
+
+		<div style="display: none;"  id="Colors" class="center">
+			<div id="vwrap">
+				<!--p class="label h">Value</p-->
+				<div class="sliderwrap il">
+					<input id="sliderV" class="noslide" oninput="fromV()" onchange="setColor(0)" max="100" min="0" type="range" value="100" step="any" />
+					<div class="sliderdisplay"></div>
+				</div><br>
+			</div>
+			<div style="display: none;"   id="kwrap">
+				<!--p class="label h">Temperature</p-->
+				<div class="sliderwrap il">
+					<input id="sliderK" class="noslide" oninput="fromK()" onchange="setColor(0)" max="10091" min="1900" type="range" value="6550" />
+					<div class="sliderdisplay"></div>
+				</div>
+			</div>
+			<div style="display: none;"  id="rgbwrap" class="center">
+				<p class="label h">RGB channels</p>
+				<div id="rwrap" class="il">
+					<div class="sliderwrap il">
+						<input id="sliderR" class="noslide" onchange="fromRgb()" max="255" min="0" type="range" value="128" />
+						<div class="sliderdisplay"></div>
+					</div>
+				</div><br>
+				<div id="gwrap" class="il">
+					<div class="sliderwrap il">
+						<input id="sliderG" class="noslide" onchange="fromRgb()" max="255" min="0" type="range" value="128" />
+						<div class="sliderdisplay"></div>
+					</div>
+				</div><br>
+				<div id="bwrap" class="il">
+					<div class="sliderwrap il">
+						<input id="sliderB" class="noslide" onchange="fromRgb()" max="255" min="0" type="range" value="128" />
+						<div class="sliderdisplay"></div>
+					</div>
+				</div><br>
+			</div>
+			<div style="display: none;"  id="wwrap" class="center">
+				<p class="label h">White channel</p>
+				<div class="sliderwrap il">
+					<input id="sliderW" class="noslide" onchange="setColor(0)" max="255" min="0" type="range" value="128" />
+					<div class="sliderdisplay"></div>
+				</div>
+			</div>
+			<div style="display: none;"  id="wbal">
+				<p class="label h">White balance</p>
+				<div class="sliderwrap il">
+					<input id="sliderA" class="noslide" onchange="setBalance(this.value)" max="255" min="0" type="range" value="128" />
+					<div class="sliderdisplay"></div>
+				</div>
+			</div>
+		</div>
+
+		<div style="display: none;"  id="Slots" class="center">
+        	<p class="label h">Color slots</p>
+			<div id="csl" class="center" style="display: none;">
+				<button class="xxs btn" onclick="selectSlot(0);">1</button>
+				<button class="xxs btn" onclick="selectSlot(1);">2</button>
+				<button class="xxs btn" onclick="selectSlot(2);">3</button>
+			</div>
+		</div>
+
+		<div style="display: none;"  id="Segments" class="center">
+			<div id="segcont"></div>
+		</div>
+
+		<div style="display: none;"  id="Presets" class="center">
+        	<p class="label h">Presets</p>
+			<div class="fnd">
+				<input type="text" class="fnd" placeholder="Search" oninput="search(this,'pcont')" onfocus="search(this)" />
+				<i class="icons clear-icon" onclick="clean(this);">&#xe38f;</i>
+				<i class="icons search-icon">&#xe0a1;</i>
+			</div>
+			<div id="pcont" class="list"></div>
+		</div>
+<center>
+	<p style="font-size:50px; color:white" >Palettes</p>
+		<div id="Effects" class="center">
+		
+			
+			<div style="padding-bottom:20px;">
+			
+				
+				<div id="fxDropdown" class="dd-content">
+					<div class="fnd">
+					
+					</div>
+					
+				</div>
+				<div style="display: none;"  id="palDropdown" class="dd-content">
+					
+						
+					</div>
+					<div id="pallist" class="list">
+						<div class="lstI" data-id="0" onClick="setPalette(0)"><a href="#0" onClick="setPalette(0)"></a><div class="lstIprev"></div></div>
+					</div>
+				</div>
+				<br>
+			</div>
+		</div>
+</center>
+	</div>
+</div>
+
+<div style="display: none;" id="connind"></div>
+<div style="display: none;" id="toast"></div>
+<div style="display: none;" id="namelabel" onclick="toggleNodes()"></div>
+
+<div style="display: none;" id="info" class="modal">
+	<div id="imgw">
+		<img class="wi" alt=""  />
+	</div><br>
+
+	<div>
+	
+	</div>
+
+</div>
+
+
+
+
+<script src="palettes.js"></script>
+</body>
+</html>
