@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:id="@android:id/background">
+            <nine-patch
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:src="@drawable/slider_thumb_focused"
+            android:dither="true" />
+        </item>
+    </layer-list>
+
+</selector>
